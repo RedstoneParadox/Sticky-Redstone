@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 
 public class StickyRedstoneWireBlockEntity extends BlockEntity {
 	// Faces
@@ -30,6 +31,58 @@ public class StickyRedstoneWireBlockEntity extends BlockEntity {
 
 	public StickyRedstoneWireBlockEntity(BlockPos pos, BlockState state) {
 		super(BlockEntitiesInit.STICKY_REDSTONE_WIRE, pos, state);
+	}
+
+	public static boolean connectsToOther(StickyRedstoneWireBlockEntity source, Direction direction, StickyRedstoneWireBlockEntity target) {
+		source.fixEdgesAndFaces();
+		target.fixEdgesAndFaces();
+
+		switch (direction) {
+			case DOWN -> {
+				return ((source.bottomNorthEdge && target.topNorthEdge)
+					|| (source.bottomSouthEdge && target.topSouthEdge)
+					|| (source.bottomEastEdge && target.topEastEdge)
+					|| (source.bottomWestEdge && target.topWestEdge))
+					&& !(source.bottomFace || target.topFace);
+			}
+			case UP -> {
+				return (source.topNorthEdge && target.bottomNorthEdge)
+					|| (source.topSouthEdge && target.bottomSouthEdge)
+					|| (source.topEastEdge && target.bottomEastEdge)
+					|| (source.topWestEdge && target.bottomWestEdge)
+					&& !(source.topFace || target.bottomFace);
+			}
+			case NORTH -> {
+				return (source.topNorthEdge && target.topSouthEdge)
+					|| (source.bottomNorthEdge && target.bottomSouthEdge)
+					|| (source.northEastEdge && target.southEastEdge)
+					|| (source.northWestEdge && target.southWestEdge)
+					&& !(source.northFace || target.southFace);
+			}
+			case SOUTH -> {
+				return (source.topSouthEdge && target.topNorthEdge)
+					|| (source.bottomSouthEdge && target.bottomNorthEdge)
+					|| (source.southEastEdge && target.northEastEdge)
+					|| (source.southWestEdge && target.northWestEdge)
+					&& !(source.southFace || target.northFace);
+			}
+			case WEST -> {
+				return (source.topWestEdge && target.topEastEdge)
+					|| (source.bottomWestEdge && target.topEastEdge)
+					|| (source.northWestEdge && target.northEastEdge)
+					|| (source.southWestEdge && target.southEastEdge)
+					&& !(source.westFace || target.eastFace);
+			}
+			case EAST -> {
+				return (target.topWestEdge && source.topEastEdge)
+					|| (target.bottomWestEdge && source.topEastEdge)
+					|| (target.northWestEdge && source.northEastEdge)
+					|| (target.southWestEdge && source.southEastEdge)
+					&& !(target.westFace || source.eastFace);
+			}
+		}
+
+		return false;
 	}
 
 	@Override
@@ -58,13 +111,13 @@ public class StickyRedstoneWireBlockEntity extends BlockEntity {
 		southWestEdge = nbt.getBoolean("SouthWestEdge");
 		northWestEdge = nbt.getBoolean("NorthWestEdge");
 
-		updateEdges();
+		fixEdgesAndFaces();
 	}
 
 	@Override
 	protected void writeNbt(NbtCompound nbt) {
 		super.writeNbt(nbt);
-		updateEdges();
+		fixEdgesAndFaces();
 		// Faces
 		nbt.putBoolean("northFace", northFace);
 		nbt.putBoolean("westFace", westFace);
@@ -89,7 +142,15 @@ public class StickyRedstoneWireBlockEntity extends BlockEntity {
 		nbt.putBoolean("northWestEdge", northWestEdge);
 	}
 
-	private void updateEdges() {
+	private void fixEdgesAndFaces() {
+		assert world != null;
+		if (!world.getBlockState(pos.up()).isSideSolidFullSquare(world, pos.up(), Direction.DOWN)) topFace = false;
+		if (!world.getBlockState(pos.down()).isSideSolidFullSquare(world, pos.down(), Direction.UP)) bottomFace = false;
+		if (!world.getBlockState(pos.north()).isSideSolidFullSquare(world, pos.north(), Direction.SOUTH)) northFace = false;
+		if (!world.getBlockState(pos.south()).isSideSolidFullSquare(world, pos.south(), Direction.NORTH)) southFace = false;
+		if (!world.getBlockState(pos.east()).isSideSolidFullSquare(world, pos.east(), Direction.WEST)) eastFace = false;
+		if (!world.getBlockState(pos.west()).isSideSolidFullSquare(world, pos.west(), Direction.EAST)) westFace = false;
+
 		// Top Edges
 		if (northFace && topFace) topEastEdge = true;
 		if (eastFace && topFace) topEastEdge = true;
