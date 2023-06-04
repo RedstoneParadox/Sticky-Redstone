@@ -42,43 +42,37 @@ public class StickyRedstoneWireBlockEntity extends BlockEntity {
 				return ((source.bottomNorthEdge && target.topNorthEdge)
 					|| (source.bottomSouthEdge && target.topSouthEdge)
 					|| (source.bottomEastEdge && target.topEastEdge)
-					|| (source.bottomWestEdge && target.topWestEdge))
-					&& !(source.bottomFace || target.topFace);
+					|| (source.bottomWestEdge && target.topWestEdge));
 			}
 			case UP -> {
 				return (source.topNorthEdge && target.bottomNorthEdge)
 					|| (source.topSouthEdge && target.bottomSouthEdge)
 					|| (source.topEastEdge && target.bottomEastEdge)
-					|| (source.topWestEdge && target.bottomWestEdge)
-					&& !(source.topFace || target.bottomFace);
+					|| (source.topWestEdge && target.bottomWestEdge);
 			}
 			case NORTH -> {
 				return (source.topNorthEdge && target.topSouthEdge)
 					|| (source.bottomNorthEdge && target.bottomSouthEdge)
 					|| (source.northEastEdge && target.southEastEdge)
-					|| (source.northWestEdge && target.southWestEdge)
-					&& !(source.northFace || target.southFace);
+					|| (source.northWestEdge && target.southWestEdge);
 			}
 			case SOUTH -> {
 				return (source.topSouthEdge && target.topNorthEdge)
 					|| (source.bottomSouthEdge && target.bottomNorthEdge)
 					|| (source.southEastEdge && target.northEastEdge)
-					|| (source.southWestEdge && target.northWestEdge)
-					&& !(source.southFace || target.northFace);
+					|| (source.southWestEdge && target.northWestEdge);
 			}
 			case WEST -> {
 				return (source.topWestEdge && target.topEastEdge)
 					|| (source.bottomWestEdge && target.topEastEdge)
 					|| (source.northWestEdge && target.northEastEdge)
-					|| (source.southWestEdge && target.southEastEdge)
-					&& !(source.westFace || target.eastFace);
+					|| (source.southWestEdge && target.southEastEdge);
 			}
 			case EAST -> {
 				return (target.topWestEdge && source.topEastEdge)
 					|| (target.bottomWestEdge && source.topEastEdge)
 					|| (target.northWestEdge && source.northEastEdge)
-					|| (target.southWestEdge && source.southEastEdge)
-					&& !(target.westFace || source.eastFace);
+					|| (target.southWestEdge && source.southEastEdge);
 			}
 		}
 
