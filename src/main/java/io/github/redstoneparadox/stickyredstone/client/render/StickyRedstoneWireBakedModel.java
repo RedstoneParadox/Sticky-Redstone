@@ -17,6 +17,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.random.RandomGenerator;
 import net.minecraft.world.BlockRenderView;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -74,6 +75,38 @@ public class StickyRedstoneWireBakedModel implements BakedModel, FabricBakedMode
 
 		if (blockView.getBlockEntity(pos) instanceof StickyRedstoneWireBlockEntity) blockEntity = (StickyRedstoneWireBlockEntity) blockView.getBlockEntity(pos);
 		else return;
+
+		generateFace(
+			blockEntity,
+			emitter,
+			0,
+			new Vector3f[]{
+				new Vector3f(0, 0, 0),
+				new Vector3f(1, 0, 0),
+				new Vector3f(1, 0, 1),
+				new Vector3f(0, 0, 1)
+			},
+			Direction.SOUTH
+		);
+		generateFace(
+			blockEntity,
+			emitter,
+			4,
+			new Vector3f[]{
+				new Vector3f(0, 0, 0),
+				new Vector3f(1, 0, 0),
+				new Vector3f(1, 0, 1),
+				new Vector3f(0, 0, 1)
+			},
+			Direction.WEST
+		);
+	}
+
+	private void generateFace(StickyRedstoneWireBlockEntity blockEntity, QuadEmitter emitter, int startVertex, Vector3f[] coordinates, Direction normalDirection) {
+		for (int index = 0; index < 4; index++) {
+			emitter.pos(startVertex + index, coordinates[index]);
+			emitter.normal(startVertex + index, normalDirection.getUnitVector());
+		}
 	}
 
 	@Override
